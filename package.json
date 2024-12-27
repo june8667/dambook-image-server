@@ -1,0 +1,11 @@
+{
+  "name": "dambook-image-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:june8667/dambook-image-server.git",
+  "author": "신주훈 <junefinger@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

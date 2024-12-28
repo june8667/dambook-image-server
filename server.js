@@ -1,38 +1,40 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-
-// `/images` 경로로 정적 파일 제공
-app.use('/images', express.static(path.join(__dirname, 'public/images')));
+const PORT = 3001;
 
 // CORS 설정
 app.use(cors());
 
-app.get('/images', (req, res) => {
-    fs.readFile('./db.json', 'utf8', (err, data) => {
-        if (err) {
-            console.error('Error reading db.json:', err);
-            return res.status(500).json({ error: 'Internal Server Error' });
-        }
+// 이미지 파일을 제공할 정적 폴더 설정
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
-        try {
-            const db = JSON.parse(data);
-            const images = db.images || [];
-            res.header("Content-Type", "application/json"); // 응답 헤더를 JSON으로 설정
-            res.send(JSON.stringify(images, null, 2)); // JSON을 예쁘게 포맷하여 전송
-        } catch (parseError) {
-            console.error('Error parsing db.json:', parseError);
-            res.status(500).json({ error: 'Internal Server Error' });
-        }
-    });
+// JSON 파일 경로 설정
+const dbPath = path.join(__dirname, 'db.json');
+
+// API 엔드포인트 정의
+app.get('/api/images', (req, res) => {
+  fs.readFile(dbPath, 'utf-8', (err, data) => {
+    if (err) {
+      console.error('Error reading db.json:', err);
+      res.status(500).send({ error: 'Internal Server Error' });
+      return;
+    }
+
+    try {
+      const jsonData = JSON.parse(data);
+      res.json(jsonData.images);
+    } catch (parseErr) {
+      console.error('Error parsing JSON:', parseErr);
+      res.status(500).send({ error: 'Internal Server Error' });
+    }
+  });
 });
 
-
-// 서버 시작
+// 서버 실행
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running at http://localhost:${PORT}`);
 });
